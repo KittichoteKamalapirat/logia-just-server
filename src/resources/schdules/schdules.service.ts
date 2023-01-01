@@ -26,8 +26,11 @@ export class SchdulesService {
     const natureQuery = randItemFromArr(natureArr);
 
     // create the video
-    const { localVidPath, localThumbPath } =
-      await this.videosService.createVidFromImgAndMp3(natureQuery);
+    const { localOutputPath, localThumbPath, localImgPath, localAudPath } =
+      await this.videosService.createVidFromImgAndMp3({
+        query: natureQuery,
+        hrNum,
+      });
 
     // Generate title and description
     const { title, description } = randomTitleAndDes({
@@ -37,7 +40,7 @@ export class SchdulesService {
 
     // upload to Youtube 📹
     const input = {
-      localVidPath,
+      localOutputPath,
       localThumbPath,
       title,
       // filename: 'file',
@@ -45,7 +48,12 @@ export class SchdulesService {
       tags: [categoryIds.Music, categoryIds.Entertainment],
     };
 
-    await this.uploadsService.loadSecretAndUploadVideo(input);
+    // await this.uploadsService.loadSecretAndUploadVideo(input)
+    await this.videosService.deleteLocalFiles({
+      localVisualPath: localThumbPath,
+      localAudPath,
+      localOutputPath,
+    });
   }
 
   async loadTxtFile(path: string) {

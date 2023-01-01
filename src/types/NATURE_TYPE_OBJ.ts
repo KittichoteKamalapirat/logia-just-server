@@ -8,10 +8,10 @@ export const NATURE_TYPE_OBJ = {
   Storm: '⛈️',
   // water
   Ocean: '🌊',
-  Rain: '🌨️',
+  'Rain Forest': '🌨️ 🌲',
   River: '',
   'River Stream': '🏞️',
-  'River bank': '🏞️',
+  'River Bank': '🏞️',
   Waterfall: '💧',
   Snowfall: '❄️',
   // wind + water

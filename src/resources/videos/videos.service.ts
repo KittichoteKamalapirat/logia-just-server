@@ -48,13 +48,19 @@ export class VideosService {
   }
   //   @Cron(CronExpression.EVERY_SECOND)
   // @Timeout(1000)
-  async createVidFromImgAndMp3(query: string) {
+  async createVidFromImgAndMp3({
+    query,
+    hrNum,
+  }: {
+    query: string;
+    hrNum: number;
+  }) {
     const freeSoundResult = await searchFreeSound({ query });
-    const pexelResult = await searchPexelPhoto('rain');
+    const pexelResult = await searchPexelPhoto(query);
 
     console.log('freeSoundResult', freeSoundResult);
-    console.log('pexelResult', pexelResult);
-    console.log('pexelResult', JSON.stringify(freeSoundResult, null, 4));
+    // console.log('pexelResult', pexelResult.img.photos.forEach);
+    pexelResult.img.photos.forEach((photo) => console.log(photo.src.landscape));
 
     const pexelIdx = Math.floor(Math.random() * pexelResult.img.photos.length);
     const freesoundIdx = Math.floor(
@@ -64,24 +70,22 @@ export class VideosService {
     const freeSoundId = freeSoundResult.sound.results[freesoundIdx].id;
     const pexelId = pexelResult.img.photos[pexelIdx].id;
 
-    const filename = `pexel_${pexelId}_freesound_${freeSoundId}`;
+    const filename = `query_${query}_pexel_${pexelId}_freesound_${freeSoundId}`;
     console.log('freesoundIdx', freesoundIdx);
-    console.log('xxxxx', freeSoundResult.sound.results[freesoundIdx]);
-    console.log('yyyy', freeSoundResult.sound.results[freesoundIdx].previews);
 
     const vidInput = {
       filename,
       imgUrl: pexelResult.img.photos[pexelIdx].src.landscape,
       audUrl:
         freeSoundResult.sound.results[freesoundIdx].previews['preview-hq-mp3'],
-      durationHr: '0.001',
+      durationHr: String(hrNum),
     };
-    await this.generateVidFromImgAndMp3(vidInput);
+    const { localImgPath, localAudPath, localOutputPath, localThumbPath } =
+      await this.generateVidFromImgAndMp3(vidInput);
 
-    const localVidPath = `${distDir}/../tmp/${filename}.mp4`; //root = dist (when compiled)
-    const localThumbPath = `${distDir}/../tmp/${filename}.jpg`;
+    //root = dist (when compiled)
 
-    return { localVidPath, localThumbPath };
+    return { localOutputPath, localThumbPath, localImgPath, localAudPath };
   }
 
   // This method can generate clip, gen aud, gen img from url
@@ -189,12 +193,33 @@ export class VideosService {
         .on('error', (error) => {
           console.log('error generating the output:', error);
         })
-        .on('progress', ({ frames }) => {
-          const totalSec = parseFloat(durationHr) * 60 * 60;
-          const ratio = (frames * 100) / totalSec;
-          const percent = Math.round(ratio * 100) / 100; // make 2 decimal
-          console.log('Processing: ' + percent + '% done');
-        })
+        // .on('progress', ({ frames }) => {
+        //   const totalSec = parseFloat(durationHr) * 60 * 60;
+        //   const ratio = (frames * 100) / totalSec;
+        //   const percent = Math.round(ratio * 100) / 100; // make 2 decimal
+        //   console.log('Processing: ' + percent + '% done');
+        // })
+        .on(
+          'progress',
+          ({
+            timemark,
+          }: {
+            frames: number;
+            currentFps: number;
+            currentKbps: number;
+            targetSize: number;
+            timemark: string;
+          }) => {
+            const hmsmArr = timemark.split(':');
+            const currSec =
+              +hmsmArr[0] * 60 * 60 + +hmsmArr[1] * 60 + +hmsmArr[2];
+
+            const totalSec = parseFloat(durationHr) * 60 * 60;
+            const ratio = currSec / totalSec;
+            const percent = Math.round(ratio * 100) / 100; // make 2 decimal
+            console.log('Processing: ' + percent + '% done');
+          },
+        )
         .save(localOutputPath)
         .on('end', () => {
           console.log('finish generating!');
@@ -219,18 +244,18 @@ export class VideosService {
   }
 
   async deleteLocalFiles({
-    localClipPath,
+    localVisualPath,
     localAudPath,
     localOutputPath,
   }: {
-    localClipPath: string;
+    localVisualPath: string;
     localAudPath: string;
     localOutputPath: string;
   }) {
     // delete the local files
-    // fs.unlinkSync(localImgPath);
-    // fs.unlinkSync(localAudPath);
-    // fs.unlinkSync(localOutputPath);
+    fs.unlinkSync(localVisualPath);
+    fs.unlinkSync(localAudPath);
+    fs.unlinkSync(localOutputPath);
   }
 
   async getLoopNum({
@@ -331,7 +356,8 @@ export class VideosService {
         durationHr,
       });
 
-      const localOutputPath = `${__dirname}/../../../tmp/${filename}.mp4`;
+      const localOutputPath = `${distDir}/../tmp/${filename}.mp4`;
+      const localThumbPath = `${distDir}/../tmp/${filename}.jpg`;
 
       await this.ffmpegSyncImgAndMp3({
         localVisualPath: localImgPath,
@@ -358,6 +384,8 @@ export class VideosService {
       // this.deleteLocalFiles({ localClipPath, localAudPath, localOutputPath });
 
       console.log('Completed! 😃');
+
+      return { localImgPath, localAudPath, localOutputPath, localThumbPath };
     } catch (error) {
       console.log('error', error);
     }

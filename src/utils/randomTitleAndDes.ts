@@ -1,9 +1,5 @@
 import { adjArr, purposeArr } from '../constants';
-import {
-  NATURE_TYPE,
-  NATURE_TYPE_EMOJIS,
-  NATURE_TYPE_OBJ,
-} from '../types/NATURE_TYPE_OBJ';
+import { NATURE_TYPE_EMOJIS, NATURE_TYPE_OBJ } from '../types/NATURE_TYPE_OBJ';
 import { randItemFromArr } from './randItemFromArr';
 import { randItemsFromArr } from './randItemsFromArr';
 
