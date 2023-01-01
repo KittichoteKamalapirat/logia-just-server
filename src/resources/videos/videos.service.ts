@@ -1,6 +1,5 @@
 import * as ffmpegPath from '@ffmpeg-installer/ffmpeg';
 import { Injectable, Logger } from '@nestjs/common';
-import { Timeout } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import * as ffmpeg from 'fluent-ffmpeg';
@@ -8,6 +7,7 @@ import * as fs from 'fs';
 import { getAudioDurationInSeconds } from 'get-audio-duration';
 import { Repository } from 'typeorm';
 import { AppService } from '../../app.service';
+import { distDir } from '../../constants';
 import { GenerateVidFromMp4AndMp3Input } from '../../types/GenerateVidFromMp4AndMp3Input';
 import { searchFreeSound } from '../../utils/searchFreeSound';
 import { searchPexel } from '../../utils/searchPexel';
@@ -27,8 +27,8 @@ export class VideosService {
 
   //   @Cron(CronExpression.EVERY_SECOND)
   // @Timeout(1000)
-  async createVidFromMp4AndMp3() {
-    const freeSoundResult = await searchFreeSound('rain');
+  async createVidFromMp4AndMp3(query: string) {
+    const freeSoundResult = await searchFreeSound({ query });
     const pexelResult = await searchPexel('rain');
 
     console.log('freeSoundResult', freeSoundResult);
@@ -48,20 +48,40 @@ export class VideosService {
   }
   //   @Cron(CronExpression.EVERY_SECOND)
   // @Timeout(1000)
-  async createVidFromImgAndMp3() {
-    const freeSoundResult = await searchFreeSound('rain');
+  async createVidFromImgAndMp3(query: string) {
+    const freeSoundResult = await searchFreeSound({ query });
     const pexelResult = await searchPexelPhoto('rain');
 
     console.log('freeSoundResult', freeSoundResult);
     console.log('pexelResult', pexelResult);
+    console.log('pexelResult', JSON.stringify(freeSoundResult, null, 4));
+
+    const pexelIdx = Math.floor(Math.random() * pexelResult.img.photos.length);
+    const freesoundIdx = Math.floor(
+      Math.random() * freeSoundResult.sound.results.length,
+    );
+
+    const freeSoundId = freeSoundResult.sound.results[freesoundIdx].id;
+    const pexelId = pexelResult.img.photos[pexelIdx].id;
+
+    const filename = `pexel_${pexelId}_freesound_${freeSoundId}`;
+    console.log('freesoundIdx', freesoundIdx);
+    console.log('xxxxx', freeSoundResult.sound.results[freesoundIdx]);
+    console.log('yyyy', freeSoundResult.sound.results[freesoundIdx].previews);
 
     const vidInput = {
-      filename: 'photo and audio file name',
-      imgUrl: pexelResult.img.photos[1].src.landscape,
-      audUrl: freeSoundResult.sound.results[0].previews['preview-hq-mp3'],
+      filename,
+      imgUrl: pexelResult.img.photos[pexelIdx].src.landscape,
+      audUrl:
+        freeSoundResult.sound.results[freesoundIdx].previews['preview-hq-mp3'],
       durationHr: '0.001',
     };
-    this.generateVidFromImgAndMp3(vidInput);
+    await this.generateVidFromImgAndMp3(vidInput);
+
+    const localVidPath = `${distDir}/../tmp/${filename}.mp4`; //root = dist (when compiled)
+    const localThumbPath = `${distDir}/../tmp/${filename}.jpg`;
+
+    return { localVidPath, localThumbPath };
   }
 
   // This method can generate clip, gen aud, gen img from url

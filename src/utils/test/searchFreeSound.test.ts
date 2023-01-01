@@ -1,7 +1,7 @@
 import { searchFreeSound } from '../searchFreeSound';
 
 describe('searchFreeSound', async () => {
-  const returnedResult = await searchFreeSound('xx');
+  const returnedResult = await searchFreeSound({ query: 'xx' });
 
   const expectedResult = '09/11/2022 00:01';
 

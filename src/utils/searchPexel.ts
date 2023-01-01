@@ -6,7 +6,7 @@ export const searchPexel = async (query: string): Promise<ClipResponse> => {
   try {
     const result = (await client.videos.search({
       query,
-      per_page: 10,
+      per_page: 80, // Default: 15 Max: 80
       orientation: 'landscape',
     })) as Videos;
 

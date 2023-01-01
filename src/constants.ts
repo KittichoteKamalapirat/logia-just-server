@@ -1,3 +1,5 @@
+import { dirname } from 'path';
+
 // ref: https://mixedanalytics.com/youtube-video-category-id-list/
 export const categoryIds = {
   Entertainment: '24',
@@ -6,17 +8,7 @@ export const categoryIds = {
   ScienceTechnology: '28',
 };
 
-export const natureArr = [
-  'Rain',
-  'Snowfall',
-  'Fire',
-  'Storm',
-  'Bird',
-  'Wind',
-  'River',
-  'Water',
-  'Thunder',
-];
+// pick one
 export const adjArr = [
   'Relaxing',
   'Refreshing',
@@ -34,3 +26,5 @@ export const purposeArr = [
   'Meditation',
   'Yoga',
 ];
+
+export const distDir = dirname(require.main.filename);

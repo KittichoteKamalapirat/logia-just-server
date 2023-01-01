@@ -18,13 +18,4 @@ describe('SchdulesService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
-  it.only('should return a random title', () => {
-    const input = {
-      hrNum: 10,
-      nature: 'Rain',
-    };
-    const output = service.getTitle(input);
-    expect(output).toBeDefined();
-  });
 });

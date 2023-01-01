@@ -1,4 +1,4 @@
-import { natureArr } from '../../constants';
+import { natureArr } from '../../types/NATURE_TYPE_OBJ';
 import { randItemFromArr } from '../randItemFromArr';
 
 describe('randItemFromArr', () => {

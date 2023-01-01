@@ -3,10 +3,10 @@ import { Timeout } from '@nestjs/schedule';
 import { promises as fs } from 'fs';
 import { dirname } from 'path';
 import { AppService } from '../../app.service';
-import { adjArr, categoryIds, purposeArr } from '../../constants';
+import { categoryIds } from '../../constants';
+import { natureArr } from '../../types/NATURE_TYPE_OBJ';
 import { randItemFromArr } from '../../utils/randItemFromArr';
-import { randItemsFromArr } from '../../utils/randItemsFromArr';
-import { randomTitle } from '../../utils/randomTitle';
+import { randomTitleAndDes } from '../../utils/randomTitleAndDes';
 import { UploadsService } from '../uploads/uploads.service';
 import { VideosService } from '../videos/videos.service';
 
@@ -23,16 +23,19 @@ export class SchdulesService {
   @Timeout(1000)
   async createPhotoVidAndUpload() {
     const hrNum = 10;
-    const localVidPath = `${distDir}/../tmp/file name.mp4`; //root = dist (when compiled)
-    const localThumbPath = `${distDir}/../tmp/file name.jpg`;
+    const natureQuery = randItemFromArr(natureArr);
 
-    await this.videosService.createVidFromImgAndMp3();
+    // create the video
+    const { localVidPath, localThumbPath } =
+      await this.videosService.createVidFromImgAndMp3(natureQuery);
 
-    // Generate title
-    const title = randomTitle({ hrNum: 10, nature: 'Rain' });
-    // Generate description
+    // Generate title and description
+    const { title, description } = randomTitleAndDes({
+      hrNum,
+      nature: natureQuery,
+    });
 
-    const description = await this.getDescription();
+    // upload to Youtube 📹
     const input = {
       localVidPath,
       localThumbPath,
