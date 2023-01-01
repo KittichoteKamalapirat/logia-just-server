@@ -7,5 +7,6 @@ import { VideosService } from './videos.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Video])],
   providers: [VideosResolver, VideosService],
+  exports: [VideosService],
 })
 export class VideosModule {}

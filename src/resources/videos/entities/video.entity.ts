@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export type VideoType = 'from_img' | 'from_clip';
+
 @ObjectType()
 @Entity()
 export class Video {
@@ -41,6 +43,10 @@ export class Video {
   @Column()
   @Field()
   videoPath: string;
+
+  @Column()
+  @Field()
+  type: VideoType;
 
   @CreateDateColumn()
   @Field()

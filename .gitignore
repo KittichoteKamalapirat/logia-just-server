@@ -3,6 +3,7 @@
 /node_modules
 
 /tmp
+/secrets
 
 # Logs
 logs

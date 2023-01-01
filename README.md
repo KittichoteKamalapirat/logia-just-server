@@ -71,4 +71,13 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
 # logia-just-server
+
+### How it works
+
+1. Generate the video. Maybe every hour?
+2. Upload to youtube
+3. Delete the video (after uploaded)
+
+1.1 Make sure to not use the already used image

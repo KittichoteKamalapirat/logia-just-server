@@ -1,16 +1,16 @@
-import { createClient, Videos } from 'pexels';
-import { ClipResponse } from '../types/Pexel';
+import { createClient, PhotosWithTotalResults } from 'pexels';
 
-export const searchPexel = async (query: string): Promise<ClipResponse> => {
+export const searchPexelPhoto = async (query: string) => {
   const client = createClient(process.env.PEXEL_API_KEY);
   try {
-    const result = (await client.videos.search({
+    console.log('fetching pexel photo');
+    const result = (await client.photos.search({
       query,
       per_page: 10,
       orientation: 'landscape',
-    })) as Videos;
+    })) as PhotosWithTotalResults;
 
-    return { clip: result };
+    return { img: result };
   } catch (error) {
     console.log('error occurred: ', error);
     return {

@@ -1,4 +1,5 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
+import { VideoType } from '../entities/video.entity';
 
 @InputType()
 export class CreateVideoInput {
@@ -22,4 +23,7 @@ export class CreateVideoInput {
 
   @Field()
   videoPath: string;
+
+  @Field()
+  type: VideoType;
 }

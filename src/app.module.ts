@@ -12,6 +12,8 @@ import { typeormConfigNest } from './config/typeorm-nest.config';
 import { VideosModule } from './resources/videos/videos.module';
 import { VideosResolver } from './resources/videos/videos.resolver';
 import { ConfigModule } from '@nestjs/config';
+import { UploadsModule } from './resources/uploads/uploads.module';
+import { SchdulesModule } from './resources/schdules/schdules.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ConfigModule } from '@nestjs/config';
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({ envFilePath: '.env.local', isGlobal: true }),
     VideosModule,
+    UploadsModule,
+    SchdulesModule,
   ],
   controllers: [AppController],
   providers: [AppService, VideosResolver],

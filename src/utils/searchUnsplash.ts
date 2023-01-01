@@ -10,13 +10,14 @@ export const searchUnsplash = async (
   unsplashPage: number,
 ): Promise<PhotosResponse> => {
   try {
+    console.log('fetching unsplashh', process.env.UNSPLASH_ACCESS_KEY);
     const result = await unsplash.search.getPhotos({
       query,
       page: unsplashPage,
       perPage: 10,
       orientation: 'landscape',
     });
-
+    console.log('result', result);
     const photos = result.response.results;
 
     return { photos };
@@ -26,7 +27,7 @@ export const searchUnsplash = async (
       errors: [
         {
           field: 'Error',
-          message: 'An error occured',
+          message: 'An error occured from Unsplash',
         },
       ],
     };

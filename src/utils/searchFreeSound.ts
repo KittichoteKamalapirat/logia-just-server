@@ -10,7 +10,6 @@ export const searchFreeSound = async (
 ): Promise<AudioResponse> => {
   try {
     console.log('fetching free sound');
-    console.log('secret', process.env.FREESOUND_CLIENT_SECRET);
     const response = await fetch(
       `https://freesound.org/apiv2/search/text/?query=${query}&fields=previews,created,type,tags,description,avg_rating,id,name,url,filesize,duration,download,license,username`,
       {
