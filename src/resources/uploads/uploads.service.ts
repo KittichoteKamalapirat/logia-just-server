@@ -38,7 +38,7 @@ interface UploadToYoutubeInput {
 
 @Injectable()
 export class UploadsService {
-  loadSecretAndUploadVideo(data: UploadVideoInput) {
+  async loadSecretAndUploadVideo(data: UploadVideoInput) {
     // create vid from remote to local file
     // upload the local file to youtube
     // delete the local file when done
@@ -106,7 +106,7 @@ export class UploadsService {
     // const thumbRes = await axios.get(thumbUrl, { responseType: 'arraybuffer' });
     // const thumbBuffer = Buffer.from(thumbRes.data, 'binary');
     // const localThumbPath = `${__dirname}/../tmp/${filename}.jpg`;
-    // fs.writeFileSync(localThumbPath, thumbBuffer);
+    // fs.writeFileSync(localThumbPath, thumbBuffer)
 
     youtube.videos.insert(
       {
@@ -122,7 +122,7 @@ export class UploadsService {
             defaultAudioLanguage: 'en',
           },
           status: {
-            privacyStatus: 'private', // TODO
+            privacyStatus: 'public', // TODO
           },
         },
         media: {

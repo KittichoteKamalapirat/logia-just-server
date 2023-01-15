@@ -27,20 +27,38 @@ export class VideosService {
 
   //   @Cron(CronExpression.EVERY_SECOND)
   // @Timeout(1000)
-  async createVidFromMp4AndMp3(query: string) {
-    const freeSoundResult = await searchFreeSound({ query });
-    const pexelResult = await searchPexel('rain');
+  async createVidFromMp4AndMp3({
+    pexelQuery,
+    freesoundQuery,
+    hrNum,
+  }: {
+    pexelQuery: string;
+    freesoundQuery: string;
+    hrNum: number;
+  }) {
+    const freeSoundResult = await searchFreeSound({ query: freesoundQuery });
+    const pexelResult = await searchPexel(pexelQuery);
 
-    console.log('freeSoundResult', freeSoundResult);
-    console.log('pexelResult', pexelResult);
+    const pexelIdx = Math.floor(Math.random() * pexelResult.clip.videos.length);
+    const freesoundIdx = Math.floor(
+      Math.random() * freeSoundResult.sound.results.length,
+    );
+
+    const freeSoundId = freeSoundResult.sound.results[freesoundIdx].id;
+    const pexelId = pexelResult.clip.videos[pexelIdx].id;
+
+    const filename = `${pexelQuery}_photo_${freesoundQuery}_sound_pexel_id_${pexelId}_freesound_id_${freeSoundId}`;
 
     const vidInput = {
-      filename: 'file name',
+      filename,
       clipUrl: pexelResult.clip.videos[0].video_files[0].link,
       audUrl: freeSoundResult.sound.results[0].previews['preview-hq-mp3'],
-      durationHr: '0.001',
+      durationHr: String(hrNum),
     };
-    this.generateVidFromMp4AndMp3(vidInput);
+    const { localClipPath, localAudPath, localOutputPath, localThumbPath } =
+      await this.generateVidFromMp4AndMp3(vidInput);
+
+    return { localOutputPath, localThumbPath, localClipPath, localAudPath };
   }
 
   async createClipVidAndUpload() {
@@ -49,18 +67,16 @@ export class VideosService {
   //   @Cron(CronExpression.EVERY_SECOND)
   // @Timeout(1000)
   async createVidFromImgAndMp3({
-    query,
+    pexelQuery,
+    freesoundQuery,
     hrNum,
   }: {
-    query: string;
+    pexelQuery: string;
+    freesoundQuery: string;
     hrNum: number;
   }) {
-    const freeSoundResult = await searchFreeSound({ query });
-    const pexelResult = await searchPexelPhoto(query);
-
-    console.log('freeSoundResult', freeSoundResult);
-    // console.log('pexelResult', pexelResult.img.photos.forEach);
-    pexelResult.img.photos.forEach((photo) => console.log(photo.src.landscape));
+    const freeSoundResult = await searchFreeSound({ query: freesoundQuery });
+    const pexelResult = await searchPexelPhoto(pexelQuery);
 
     const pexelIdx = Math.floor(Math.random() * pexelResult.img.photos.length);
     const freesoundIdx = Math.floor(
@@ -70,8 +86,7 @@ export class VideosService {
     const freeSoundId = freeSoundResult.sound.results[freesoundIdx].id;
     const pexelId = pexelResult.img.photos[pexelIdx].id;
 
-    const filename = `query_${query}_pexel_${pexelId}_freesound_${freeSoundId}`;
-    console.log('freesoundIdx', freesoundIdx);
+    const filename = `${pexelQuery}_photo_${freesoundQuery}_sound_pexel_id_${pexelId}_freesound_id_${freeSoundId}`;
 
     const vidInput = {
       filename,
@@ -300,7 +315,8 @@ export class VideosService {
         durationHr,
       });
 
-      const localOutputPath = `${__dirname}/../../../tmp/${filename}.mp4`;
+      const localOutputPath = `${distDir}/../tmp/${filename}_output.mp4`;
+      const localThumbPath = `${distDir}/../tmp/${filename}.jpg`;
 
       await this.ffmpegSyncMp4AndMp3({
         localVisualPath: localClipPath,
@@ -327,6 +343,7 @@ export class VideosService {
       // this.deleteLocalFiles({ localClipPath, localAudPath, localOutputPath });
 
       console.log('Completed! 😃');
+      return { localClipPath, localAudPath, localOutputPath, localThumbPath };
     } catch (error) {
       console.log('error', error);
     }
